@@ -26,8 +26,8 @@ http://www.binarii.com/files/papers/c_sockets.txt
 #include <ctype.h>
 #include <math.h>
 
-int fd;
-
+int arduino;
+int light_model;
 int parse(char *request){
       
       char re[1024];
@@ -54,26 +54,32 @@ int parse(char *request){
       if(strcmp(token,"light") == 0){
             token = strtok(NULL,delim);
             printf("%s\n",token);
+            printf("%d\n",strcmp(token,"blue"));
+            printf("%d\n",strcmp(token,"red"));
             if(strcmp(token,"blue")==0){
                   msg = "BLUE";
+                  light_model = 1;
+                  printf("%d\n",light_model);
                   printf("%s\n",msg);
-                  write(fd,msg,strlen(msg));
+                  write(arduino,msg,strlen(msg));
             }
             else if(strcmp(token,"red") == 0){
-                  msg = "RED\n";
-                  write(fd,msg,strlen(msg));
+                  light_model = 1;
+                  msg = "RED";
+                  write(arduino,msg,strlen(msg));
             }else if(strcmp(token,"green") == 0){
-                  msg = "GREEN\n";
-                  write(fd,msg,strlen(msg));
+                  light_model = 1;
+                  msg = "GREEN";
+                  write(arduino,msg,strlen(msg));
             }else if(strcmp(token,"off") == 0){
-                  msg = "OFF\n";
-                  write(fd,msg,strlen(msg));
+                  msg = "OFF";
+                  write(arduino,msg,strlen(msg));
             }else if(strcmp(token,"random") == 0){
-                  msg = "RANDOM\n";
-                  write(fd,msg,strlen(msg));
+                  msg = "RANDOM";
+                  write(arduino,msg,strlen(msg));
             }else if(strcmp(token,"normal") == 0){
-                  msg = "NORMAL\n";
-                  write(fd,msg,strlen(msg));
+                  msg = "NORMAL";
+                  write(arduino,msg,strlen(msg));
             }
       }
       return 0;
@@ -222,9 +228,9 @@ int main(int argc, char *argv[])
     exit(-1);
   }
 
-    fd = open(filename, O_RDWR | O_NOCTTY | O_NDELAY);
+    arduino = open(filename, O_RDWR | O_NOCTTY | O_NDELAY);
   
-    if (fd < 0) {
+    if (arduino < 0) {
         perror("Could not open file\n");
         exit(1);
     }
@@ -232,12 +238,12 @@ int main(int argc, char *argv[])
         printf("Successfully opened %s for reading and writing\n", filename);
     }
      
-    configure(fd);
+    configure(arduino);
 //     char* msg = "asdadas\n";
 //     int i = write(fd,msg,strlen(msg));
 
     pthread_t threads[3];
-    pthread_create(&threads[0], NULL, read_from_arduino, (void *)&fd);
+    pthread_create(&threads[0], NULL, read_from_arduino, (void *)&arduino);
     pthread_create(&threads[1], NULL, (void *)&start_server, (void*) &port_number);
 //     pthread_create(&threads[2], NULL, (void *)&start_server, (void*) &port_number);
     pthread_join(threads[0],NULL);
