@@ -23,7 +23,7 @@ function changeLightColor() {
     // console.log(color);
     // console.log($(this).attr("value"));
     var color = $(this).attr("value");
-    var res = $.get("http://localhost:1306/?light?" + color);
+    var res = $.get("http://localhost:1306/?light?" + color+"?");
 }
 function arduinoControl() {
     var value = $(this).attr("value");
