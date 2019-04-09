@@ -37,8 +37,8 @@ const byte NumberLookup[16] =   {0x3F,0x06,0x5B,0x4F,0x66,
 int is_f = 0;
 int light_model = 0;
 int light_color = 0;
-char buf[100];
-String s = "";
+//char buf[100];
+String buf = "";
 /* Function prototypes */
 void Cal_temp (int&, byte&, byte&, bool&);
 void Dis_7SEG (int, byte, byte, bool);
@@ -127,39 +127,42 @@ void loop()
    
     /* Display temperature on the serial monitor. 
        Comment out this line if you don't use serial monitor.*/
+       
     if(Serial.available()>0){
-      String buf = "";
+//      String buf = "";
       buf = Serial.readString();
-
-    if(buf.equals("FAH")){
+      Serial.print(buf);
+      bool sss = buf.equals("BLUE");
+      Serial.print(sss);
+    if(buf.equals("FAH") == 1){
         is_f = 1;
       }
-      else if(buf.equals("CEL")){
+      else if(buf.equals("CEL") == 1){
         is_f = 0;
       }
-      else if(buf.equals("RED")){
+      else if(buf.equals("RED") == 1){
         light_model = 1;
         light_color = 1;
-      }else if(buf.equals("BLUE")){
-        light_model = 0;
+      }else if(buf.equals("BLUE") == 1 || buf.equals("BLUE\n") == 1){
+        light_model = 1;
         light_color = 0;
-      }else if(buf.equals("GREEN")){
-        light_model = 0;
+      }else if(buf.equals("GREEN") == 1){
+        light_model = 1;
         light_color = 2;
-      }else if(buf.equals("OFF")){
+      }else if(buf.equals("OFF") == 1){
         light_model = 0;
       }
-      else if(buf.equals("RANDOM")){
+      else if(buf.equals("RANDOM") == 1){
         light_model = 2;
       }
-      else if(buf.equals("NORMAL")){
+      else if(buf.equals("NORMAL") == 1){
         light_model = 3;
       }
 
     }
     
     
-    if(is_f == 0){
+    if(is_f == 1){
       Convert(Temperature_H, Decimal);
     }
     

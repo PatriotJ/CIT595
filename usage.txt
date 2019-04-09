@@ -1,0 +1,11 @@
+Change light:
+    /?light?{modeValue}
+
+    modeValue: blue, red, green, off, random, normal
+Request temperature:
+    /?temperature?1
+
+Switching temperature unit:
+    /?unit?{unitName}
+
+    unitName: celsius, farenheit

@@ -12,8 +12,8 @@
 #include <math.h>
 #include <pthread.h> 
 #include <float.h>
-
-
+// int fd;
+// pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
 /*
 This code configures the file descriptor for use as a serial port.
 */
@@ -42,6 +42,8 @@ void configure(int fd) {
 }
 
 
+
+
 int main(int argc, char* argv[]) {
 
   if (argc < 2) {
@@ -66,15 +68,18 @@ int main(int argc, char* argv[]) {
 
   configure(fd);
 
+
   /*
     Write the rest of the program below, using the read and write system calls.
   */
 
 while(1){
   char s[100];
-  scanf("%s",s);
-    // char* msg = "hello\n";
-    int bytes_sent = write(fd,s,strlen(s));
+  char buf[1];
+    int bytes_read = read(fd,buf,1);
+    if(bytes_read > 1){
+      printf("%s\n",buf);
+    }
     // sleep(100);
 }
 

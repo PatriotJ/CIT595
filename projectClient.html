@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="jquery.js"></script>
+	<title></title>
+</head>
+<body>
+        
+        <p id = 'temperaturePTag'>Current temperature is : <span id = 'temperature'></span> <span class = 'unit'></span></p>
+        <p id = 'maxPTag'>Max temperature is : <span id = 'max'></span> <span class = 'unit'></span></p>
+        <p id = 'minPTag'>Min temperature is : <span id = 'min'></span> <span class = 'unit'></span></p>
+        <p id = 'avgPTag'>Average temperature is : <span id = 'avg'></span> <span class = 'unit'></span> </p>
+        
+        <!-- <button id = 'clickMe'>Click Me</button> -->
+        <br>
+        <br>
+        <div id = 'lightControl'>
+            <p>Choose the color of Arduino</p>
+            <button id = 'blueLight' value = 'blue'>Blue</button>
+            <button id = 'redLight' value = 'red'>Red</button>
+            <button id = 'greenLight' value = 'green'>Green</button>
+            <button id = 'normal' value = 'normal'>Normal</button>
+            <button id = 'off' value = 'off'>Off</button>
+            <button id = 'random' value = 'random'>Random Color</button>
+        
+        </div>
+        <br>
+        <br>
+        <div>
+            Switching Temperature Units
+                <button class = 'unitsControl' value = 'celsius'>Celsius</button>
+                <button class = 'unitsControl' value = 'farenheit'>Farenheit</button>
+        </div>
+        <br>
+        <br>
+        <div>
+            Stop updating temperature:
+            <button class = 'arduinoControl' value = 'stop'>Stop Arduino</button>
+            <button class = 'arduinoControl' value = 'open'>Open Arduino</button>
+        </div>
+        <script src="projectClient.js"></script>
+        <!-- <a href="http://localhost:1306/temp">Click me</a> -->
+</body>
+</html>

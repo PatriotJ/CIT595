@@ -48,12 +48,15 @@ int parse(char *request){
       if(token == NULL){
             return 0;
       }
-      // printf("%s\n",token);
+      printf("aaa%s\n",token);
       char* msg;
+      printf("%d\n",strcmp(token,"light"));
       if(strcmp(token,"light") == 0){
             token = strtok(NULL,delim);
+            printf("%s\n",token);
             if(strcmp(token,"blue")==0){
-                  msg = "BLUE\n";
+                  msg = "BLUE";
+                  printf("%s\n",msg);
                   write(fd,msg,strlen(msg));
             }
             else if(strcmp(token,"red") == 0){
@@ -177,10 +180,10 @@ int PORT_NUMBER = *(int*)arg;
       sprintf(t5,"%d",is_c);
       strcat(r,t5);
       strcat(r,"\n}");
-      printf("%s\n",r);
+      // printf("%s\n",r);
 	// 6. send: send the outgoing message (response) over the socket
 	// note that the second argument is a char*, and the third is the number of chars	
-      // printf("%s\n",r);
+      printf("%s\n",r);
 	send(fd, r, strlen(r), 0);
       memset(r,0,1000);
       }
