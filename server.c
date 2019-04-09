@@ -82,6 +82,17 @@ int parse(char *request){
                   write(arduino,msg,strlen(msg));
             }
       }
+      else if(strcmp(token,"temperature") == 0){
+            token = strtok(NULL,delim);
+            if(strcmp(token,"F") == 0){
+                  msg = "FAH";
+                  write(arduino,msg,strlen(msg));
+            }
+            else if(strcmp(token,"C") == 0){
+                  msg = "CEL";
+                  write(arduino,msg,strlen(msg));
+            }
+      }
       return 0;
 }
 
