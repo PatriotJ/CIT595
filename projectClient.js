@@ -45,7 +45,7 @@ function switchingUnit() {
 }
 // $("#clickMe").click(getTemperature);
 var stop = false;
-var timer = setInterval(getTemperature, 60000);
+var timer = setInterval(getTemperature, 1000);
 var offset = 0;
 
 // color control
