@@ -25,9 +25,10 @@ http://www.binarii.com/files/papers/c_sockets.txt
 
 #include <ctype.h>
 #include <math.h>
-
+pthread_mutex_t request_lock = PTHREAD_MUTEX_INITIALIZER;
 int arduino;
 int light_model;
+char request[1024];
 int parse(char *request){
       
       char re[1024];
@@ -139,9 +140,9 @@ int PORT_NUMBER = *(int*)arg;
       printf("\nServer configured to listen on port %d\n", PORT_NUMBER);
       fflush(stdout);
      int i = 1;
-     while(i < 100){
-           i++;
-           printf("%d\n",i);
+     while(i){
+      //      i++;
+      //      printf("%d\n",i);
       // 4. accept: wait here until we get a connection on that port
       int sin_size = sizeof(struct sockaddr_in);
       int fd = accept(sock, (struct sockaddr *)&client_addr,(socklen_t *)&sin_size);
@@ -149,15 +150,17 @@ int PORT_NUMBER = *(int*)arg;
 	printf("Server got a connection from (%s, %d)\n", inet_ntoa(client_addr.sin_addr),ntohs(client_addr.sin_port));
       
 	// buffer to read data into
-	char request[1024];
+	// char request[1024];
 	
 	// 5. recv: read incoming message (request) into buffer
+      pthread_mutex_lock(&request_lock);
 	int bytes_received = recv(fd,request,1024,0);
 	// null-terminate the string
 	request[bytes_received] = '\0';
 	// print it to standard out
 	// printf("This is the incoming request:\n%s\n", request);
       int xxx = parse(request);
+      pthread_mutex_unlock(&request_lock);
 
 
 
@@ -239,22 +242,22 @@ int main(int argc, char *argv[])
     exit(-1);
   }
 
-    arduino = open(filename, O_RDWR | O_NOCTTY | O_NDELAY);
+//     arduino = open(filename, O_RDWR | O_NOCTTY | O_NDELAY);
   
-    if (arduino < 0) {
-        perror("Could not open file\n");
-        exit(1);
-    }
-    else {
-        printf("Successfully opened %s for reading and writing\n", filename);
-    }
+//     if (arduino < 0) {
+//         perror("Could not open file\n");
+//         exit(1);
+//     }
+//     else {
+//         printf("Successfully opened %s for reading and writing\n", filename);
+//     }
      
-    configure(arduino);
+//     configure(arduino);
 //     char* msg = "asdadas\n";
 //     int i = write(fd,msg,strlen(msg));
 
     pthread_t threads[3];
-    pthread_create(&threads[0], NULL, read_from_arduino, (void *)&arduino);
+    pthread_create(&threads[0], NULL, read_from_arduino, (void *)filename);
     pthread_create(&threads[1], NULL, (void *)&start_server, (void*) &port_number);
 //     pthread_create(&threads[2], NULL, (void *)&start_server, (void*) &port_number);
     pthread_join(threads[0],NULL);

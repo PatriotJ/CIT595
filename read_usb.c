@@ -22,6 +22,11 @@ int temp_cur = 0;
 int temp_size = 0;
 float sum_temp = 0;
 int control = 1;
+int arduino;
+// 0 means not disconnected
+// 1 means disconnected
+int connect = 1;
+
 /*
 This code configures the file descriptor for use as a serial port.
 */
@@ -88,16 +93,33 @@ int temprature_change(char* s){
 }
 
 void* read_from_arduino(void* arg){
-  int fd = *(int*)arg;
+
+  char* filename = (char*)arg;
+  printf("%s\n",filename);
+  arduino = open(filename, O_RDWR | O_NOCTTY | O_NDELAY);
+  if (arduino < 0) {
+        perror("Could not open file\n");
+        exit(1);
+    }
+    else {
+        printf("Successfully opened %s for reading and writing\n", filename);
+    }
+     
+    configure(arduino);
+  // int fd = *(int*)arg;
   int i = 0;
   char arr[100];
   int start = 0;
   int arr_pos = 0;
   while(control){
     char buf[1];
-
-    int bytes_read = read(fd,buf,1);
+    while(connect == 1){
+    int bytes_read = read(arduino,buf,1);
     // printf("%s",buf);
+    if(errno == ENXIO || errno == EBADF){
+      connect = 0;
+      continue;
+    }
     if(bytes_read <= 0){
       continue;
     }
@@ -114,10 +136,8 @@ void* read_from_arduino(void* arg){
             arr[arr_pos] = buf[0];
             arr_pos ++;
             if(buf[0] == '\n'){
-
                 if(arr_pos >= 34){
                     temprature_change(arr);
-                    
                     arr_pos = 0;
                     start = 0;
                 }
@@ -126,10 +146,18 @@ void* read_from_arduino(void* arg){
             }
         }
     }
-    
- 
   }
+  arduino = open(filename, O_RDWR | O_NOCTTY | O_NDELAY);
+  if(arduino < 0){
+    sleep(1);
+  }
+  else{
+    connect = 1;
+    configure(arduino);
+  }
+
   
+}
 }
 
 void* print_tempareture(void* arg){
