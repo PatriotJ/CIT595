@@ -19,7 +19,8 @@ float max_temp;
 float min_temp;
 float avg_temp;
 float current_temp;
-
+int control;
+int connected;
 void configure(int fd);
 int temprature_change(char* s);
 void* read_from_arduino(void* arg);

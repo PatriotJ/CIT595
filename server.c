@@ -271,10 +271,8 @@ http://www.binarii.com/files/papers/c_sockets.txt
 #include <string.h>
 #include "read_usb.h"
 #include <pthread.h>
-
 #include <fcntl.h>
 #include <signal.h>
-
 #include <termios.h>
 
 
@@ -284,6 +282,8 @@ pthread_mutex_t request_lock = PTHREAD_MUTEX_INITIALIZER;
 int arduino;
 int light_model;
 char request[1024];
+int is_c = 1;
+
 int parse(char *request){
       
       char re[1024];
@@ -296,17 +296,16 @@ int parse(char *request){
             // printf("0");
             return 0;
       }
-      if(strcmp(token,"temperature") != 0){
-            printf("%s\n",token);
-      }
-      // printf("%s\n",token);
+      
       token = strtok(NULL,delim);
       if(token == NULL){
             return 0;
       }
-      printf("aaa%s\n",token);
+     
       char* msg;
       printf("%d\n",strcmp(token,"light"));
+      
+      // control light
       if(strcmp(token,"light") == 0){
             token = strtok(NULL,delim);
             printf("%s\n",token);
@@ -338,16 +337,36 @@ int parse(char *request){
                   write(arduino,msg,strlen(msg));
             }
       }
+      // control C or F
       else if(strcmp(token,"temperature") == 0){
             token = strtok(NULL,delim);
             if(strcmp(token,"F") == 0){
                   msg = "FAH";
+                  is_c = 0;
                   write(arduino,msg,strlen(msg));
             }
             else if(strcmp(token,"C") == 0){
                   msg = "CEL";
+                  is_c = 1;
                   write(arduino,msg,strlen(msg));
             }
+      }
+      
+      // whether show or not
+      else if(strcmp(token,"show") == 0){
+            token = strtok(NULL,delim);
+            if(strcmp(token,"off") == 0){
+                  msg = "OFF";
+                  write(arduino,msg,strlen(msg));
+            }
+            else if(strcmp(token,"on") == 0){
+                  msg = "ON";
+                  write(arduino,msg,strlen(msg));
+            }
+      }
+      // shut down both read and server.
+      else if(strcmp(token,"off") == 0){
+            control = 0;
       }
       return 0;
 }
@@ -394,8 +413,7 @@ int PORT_NUMBER = *(int*)arg;
       // once you get here, the server is set up and about to start listening
       printf("\nServer configured to listen on port %d\n", PORT_NUMBER);
       fflush(stdout);
-     int i = 1;
-     while(i){
+     while(control){
       //      i++;
       //      printf("%d\n",i);
       // 4. accept: wait here until we get a connection on that port
@@ -426,7 +444,6 @@ int PORT_NUMBER = *(int*)arg;
       
       char *reply = "HTTP/1.1 200 OK\nAccess-Control-Allow-Origin: * \nContent-Type: application/json\n\n{\n\"temperature\":";
       strcat(r,reply);
-      // gvct(current_temp,7,t1);
       sprintf(t1,"%f",current_temp);
       strcat(r,t1);
 
@@ -434,27 +451,39 @@ int PORT_NUMBER = *(int*)arg;
       strcat(r,reply2);
       char t2[20];
       sprintf(t2,"%f",max_temp);
-      // gvct(max_temp,7,t2);
       strcat(r,t2);
+
       char *reply3 = ",\n\"min_temp\":";
       strcat(r,reply3);
       char t3[20];
       sprintf(t3,"%f",min_temp);
-      // gvct(min_temp,7,t3);
       strcat(r,t3);
+
       char* reply4 = ",\n\"avg_temp\":";
       strcat(r,reply4);
       char t4[20];
       sprintf(t4,"%f",avg_temp);
-      // gvct(avg_temp,r,t4);
       strcat(r,t4);
+
       char* reply5 = ",\n\"celsius\":";
       strcat(r,reply5);
       char t5[10];
-      int is_c = 1;
+      // int is_c = 1;
       sprintf(t5,"%d",is_c);
       strcat(r,t5);
+
+      char* reply6 = ",\n\"connect\":";
+      strcat(r,reply6);
+      char t6[10];
+      sprintf(t6,"%d",connected);
+      strcat(r,t6);
+
       strcat(r,"\n}");
+
+      
+
+
+
       // printf("%s\n",r);
 	// 6. send: send the outgoing message (response) over the socket
 	// note that the second argument is a char*, and the third is the number of chars	
@@ -497,19 +526,6 @@ int main(int argc, char *argv[])
     exit(-1);
   }
 
-//     arduino = open(filename, O_RDWR | O_NOCTTY | O_NDELAY);
-  
-//     if (arduino < 0) {
-//         perror("Could not open file\n");
-//         exit(1);
-//     }
-//     else {
-//         printf("Successfully opened %s for reading and writing\n", filename);
-//     }
-     
-//     configure(arduino);
-//     char* msg = "asdadas\n";
-//     int i = write(fd,msg,strlen(msg));
 
     pthread_t threads[3];
     pthread_create(&threads[0], NULL, read_from_arduino, (void *)filename);

@@ -37,6 +37,7 @@ const byte NumberLookup[16] =   {0x3F,0x06,0x5B,0x4F,0x66,
 int is_f = 0;
 int light_model = 0;
 int light_color = 0;
+int turn_on = 0;
 //char buf[100];
 String buf = "";
 /* Function prototypes */
@@ -134,7 +135,7 @@ void loop()
       Serial.print(buf);
       bool sss = buf.equals("BLUE");
       Serial.print(sss);
-    if(buf.equals("FAH") == 1){
+      if(buf.equals("FAH") == 1){
         is_f = 1;
       }
       else if(buf.equals("CEL") == 1){
@@ -157,6 +158,10 @@ void loop()
       }
       else if(buf.equals("NORMAL") == 1){
         light_model = 3;
+      }else if(buf.equals("OFF") == 1){
+        turn_on = 0;
+      }else if(buf.equals("ON") == 1){
+        turn_on = 1;
       }
 
     }
@@ -167,13 +172,13 @@ void loop()
     }
     
     SerialMonitorPrint (Temperature_H, Decimal, IsPositive);
-    
+    if(turn_on == 1){
     /* Update RGB LED.*/
     UpdateRGB (Temperature_H);
     
     /* Display temperature on the 7-Segment */
     Dis_7SEG (Decimal, Temperature_H, Temperature_L, IsPositive);
-    
+    }
     delay (1000);        /* Take temperature read every 1 second */
   }
 } 

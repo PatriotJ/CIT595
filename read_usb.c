@@ -159,7 +159,7 @@
 #include <math.h>
 #include <pthread.h> 
 #include <float.h>
-// #include "read_demo.h"
+#include "read_usb.h"
 float temperature[3600];
 float max_temp = -FLT_MIN;
 float min_temp = FLT_MAX;
@@ -172,7 +172,7 @@ int control = 1;
 int arduino;
 // 0 means not disconnected
 // 1 means disconnected
-int connect = 1;
+int connected = 1;
 
 /*
 This code configures the file descriptor for use as a serial port.
@@ -260,11 +260,11 @@ void* read_from_arduino(void* arg){
   int arr_pos = 0;
   while(control){
     char buf[1];
-    while(connect == 1){
+    while(connected == 1){
     int bytes_read = read(arduino,buf,1);
     // printf("%s",buf);
     if(errno == ENXIO || errno == EBADF){
-      connect = 0;
+      connected = 0;
       continue;
     }
     if(bytes_read <= 0){
@@ -299,7 +299,7 @@ void* read_from_arduino(void* arg){
     sleep(1);
   }
   else{
-    connect = 1;
+    connected = 1;
     configure(arduino);
   }
 
