@@ -28,8 +28,14 @@ function changeLightColor() {
 function arduinoControl() {
     var value = $(this).attr("value");
     // console.log(value);
-    if(value == "stop") stopUpdate();
-    if(value == "open") updateTemperature();
+    if(value == "stop") {
+        stopUpdate();
+        var res = $.get("http://localhost:1306/?reading?stop");
+    }
+    if(value == "open") {
+        updateTemperature();
+        var res = $.get("http://localhost:1306/?reading?resume");
+    }
     
 }
 function stopUpdate() {
