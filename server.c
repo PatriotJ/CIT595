@@ -338,14 +338,14 @@ int parse(char *request){
             }
       }
       // control C or F
-      else if(strcmp(token,"temperature") == 0){
+      else if(strcmp(token,"unit") == 0){
             token = strtok(NULL,delim);
-            if(strcmp(token,"F") == 0){
+            if(strcmp(token,"farenheit") == 0){
                   msg = "FAH";
                   is_c = 0;
                   write(arduino,msg,strlen(msg));
             }
-            else if(strcmp(token,"C") == 0){
+            else if(strcmp(token,"celsius") == 0){
                   msg = "CEL";
                   is_c = 1;
                   write(arduino,msg,strlen(msg));
@@ -353,7 +353,7 @@ int parse(char *request){
       }
       
       // whether show or not
-      else if(strcmp(token,"show") == 0){
+      else if(strcmp(token,"temperature") == 0){
             token = strtok(NULL,delim);
             if(strcmp(token,"off") == 0){
                   msg = "OFF";

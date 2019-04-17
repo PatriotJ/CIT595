@@ -13,7 +13,7 @@ function getTemperature() {
         else if(data.celsius == 1) {
             $('.unit').html("C");
         }
-        
+        // there should be another tag to show whether sensor is connected or not
         // there is another tag to indicate C or F
         // offset++;
     });
