@@ -353,7 +353,7 @@ int parse(char *request){
       }
       
       // whether show or not
-      else if(strcmp(token,"temperature") == 0){
+      else if(strcmp(token,"reading") == 0){
             token = strtok(NULL,delim);
             if(strcmp(token,"off") == 0){
                   msg = "OFF";
