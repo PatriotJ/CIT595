@@ -49,6 +49,10 @@ function switchingUnit() {
     var unit = $(this).attr('value');
     var res = $.get("http://localhost:1306/?unit?" + unit);
 }
+function terminate() {
+    console.log("in terminate method");
+    var res = $.get("http://localhost:1306/?off?");
+}
 // $("#clickMe").click(getTemperature);
 var stop = false;
 var timer = setInterval(getTemperature, 1000);
@@ -64,3 +68,4 @@ $("#normal").click(changeLightColor);
 // temperature update control
 $(".arduinoControl").click(arduinoControl);
 $(".unitsControl").click(switchingUnit);
+$(".terminate").click(terminate);
