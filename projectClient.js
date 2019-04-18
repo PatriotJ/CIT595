@@ -30,11 +30,11 @@ function arduinoControl() {
     // console.log(value);
     if(value == "stop") {
         stopUpdate();
-        var res = $.get("http://localhost:1306/?reading?stop");
+        var res = $.get("http://localhost:1306/?reading?stop?");
     }
     if(value == "open") {
         updateTemperature();
-        var res = $.get("http://localhost:1306/?reading?resume");
+        var res = $.get("http://localhost:1306/?reading?resume?");
     }
     
 }
@@ -47,7 +47,7 @@ function updateTemperature() {
 
 function switchingUnit() {
     var unit = $(this).attr('value');
-    var res = $.get("http://localhost:1306/?unit?" + unit);
+    var res = $.get("http://localhost:1306/?unit?" + unit+"?");
 }
 function terminate() {
     console.log("in terminate method");

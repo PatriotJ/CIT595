@@ -168,7 +168,7 @@ float current_temp;
 int temp_cur = 0; 
 int temp_size = 0;
 float sum_temp = 0;
-int control = 1;
+int control;
 int arduino;
 // 0 means not disconnected
 // 1 means disconnected
@@ -258,9 +258,12 @@ void* read_from_arduino(void* arg){
   char arr[100];
   int start = 0;
   int arr_pos = 0;
-  while(control){
+  while(control == 1){
     char buf[1];
     while(connected == 1){
+      if(control == 0){
+        break;
+      }
     int bytes_read = read(arduino,buf,1);
     // printf("%s",buf);
     if(errno == ENXIO || errno == EBADF){
@@ -305,6 +308,7 @@ void* read_from_arduino(void* arg){
 
   
 }
+printf("Stop reading\n");
 }
 
 void* print_tempareture(void* arg){

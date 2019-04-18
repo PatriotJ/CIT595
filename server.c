@@ -285,7 +285,7 @@ char request[1024];
 int is_c = 1;
 
 int parse(char *request){
-      
+      // printf("%s\n",request);
       char re[1024];
       strcpy(re,request);
       // printf("%s\n",re);
@@ -303,19 +303,20 @@ int parse(char *request){
       }
      
       char* msg;
-      printf("%d\n",strcmp(token,"light"));
+      // printf("%d\n",strcmp(token,"light"));
       
       // control light
+      printf("%s\n",token);
       if(strcmp(token,"light") == 0){
             token = strtok(NULL,delim);
-            printf("%s\n",token);
-            printf("%d\n",strcmp(token,"blue"));
-            printf("%d\n",strcmp(token,"red"));
+            // printf("%s\n",token);
+            // printf("%d\n",strcmp(token,"blue"));
+            // printf("%d\n",strcmp(token,"red"));
             if(strcmp(token,"blue")==0){
                   msg = "BLUE";
                   light_model = 1;
-                  printf("%d\n",light_model);
-                  printf("%s\n",msg);
+                  // printf("%d\n",light_model);
+                  // printf("%s\n",msg);
                   write(arduino,msg,strlen(msg));
             }
             else if(strcmp(token,"red") == 0){
@@ -355,12 +356,13 @@ int parse(char *request){
       // whether show or not
       else if(strcmp(token,"reading") == 0){
             token = strtok(NULL,delim);
-            if(strcmp(token,"off") == 0){
-                  msg = "OFF";
+            printf("%s\n",token);
+            if(strcmp(token,"stop") == 0){
+                  msg = "STOP";
                   write(arduino,msg,strlen(msg));
             }
-            else if(strcmp(token,"on") == 0){
-                  msg = "ON";
+            else if(strcmp(token,"resume") == 0){
+                  msg = "RESUME";
                   write(arduino,msg,strlen(msg));
             }
       }
@@ -435,7 +437,10 @@ int PORT_NUMBER = *(int*)arg;
       int xxx = parse(request);
       pthread_mutex_unlock(&request_lock);
 
-
+      if(control == 0){
+            control = 0;
+            break;
+      }
 
 
 	// this is the message that we'll send back
@@ -484,10 +489,10 @@ int PORT_NUMBER = *(int*)arg;
 
 
 
-      // printf("%s\n",r);
+
 	// 6. send: send the outgoing message (response) over the socket
 	// note that the second argument is a char*, and the third is the number of chars	
-      printf("%s\n",r);
+
 	send(fd, r, strlen(r), 0);
       memset(r,0,1000);
       }
@@ -525,8 +530,9 @@ int main(int argc, char *argv[])
     printf("\nPlease specify a port number greater than 1024\n");
     exit(-1);
   }
-
-
+printf("%d\n",control);
+control = 1;
+printf("%d\n",control);
     pthread_t threads[3];
     pthread_create(&threads[0], NULL, read_from_arduino, (void *)filename);
     pthread_create(&threads[1], NULL, (void *)&start_server, (void*) &port_number);
