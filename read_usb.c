@@ -173,7 +173,7 @@ int arduino;
 // 0 means not disconnected
 // 1 means disconnected
 int connected = 1;
-
+int is_c = 1;
 /*
 This code configures the file descriptor for use as a serial port.
 */
@@ -208,7 +208,11 @@ int temprature_change(char* s){
       char* k = &s[i];
       // float cur_temperature = atof(k);
       current_temp = atof(k);
+      if(is_c == 0){
+        current_temp = (current_temp - 32) * 5 / 9;
+      }
       if(temp_size < 3600){
+        
         temperature[temp_cur] = current_temp;
         sum_temp += current_temp;
         

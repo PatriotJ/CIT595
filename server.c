@@ -282,7 +282,7 @@ pthread_mutex_t request_lock = PTHREAD_MUTEX_INITIALIZER;
 int arduino;
 int light_model;
 char request[1024];
-int is_c = 1;
+
 
 int parse(char *request){
       // printf("%s\n",request);
@@ -446,28 +446,42 @@ int PORT_NUMBER = *(int*)arg;
 	// this is the message that we'll send back
       char r[1000];
       char t1[20];
-      
+      float current,max,min,avg;
+      if(is_c == 0){
+            current = current_temp * 1.8 +32;
+            max = max_temp * 1.8 + 32;
+            min = min*1.8 + 32;
+            avg = avg_temp * 1.8 + 32;
+      }
+      else{
+            current = current_temp;
+            max = max_temp;
+            min = min_temp;
+            avg = avg_temp;
+      }
+
       char *reply = "HTTP/1.1 200 OK\nAccess-Control-Allow-Origin: * \nContent-Type: application/json\n\n{\n\"temperature\":";
       strcat(r,reply);
-      sprintf(t1,"%f",current_temp);
+      
+      sprintf(t1,"%f",current);
       strcat(r,t1);
 
       char *reply2 = ",\n\"max_temp\":";
       strcat(r,reply2);
       char t2[20];
-      sprintf(t2,"%f",max_temp);
+      sprintf(t2,"%f",max);
       strcat(r,t2);
 
       char *reply3 = ",\n\"min_temp\":";
       strcat(r,reply3);
       char t3[20];
-      sprintf(t3,"%f",min_temp);
+      sprintf(t3,"%f",min);
       strcat(r,t3);
 
       char* reply4 = ",\n\"avg_temp\":";
       strcat(r,reply4);
       char t4[20];
-      sprintf(t4,"%f",avg_temp);
+      sprintf(t4,"%f",avg);
       strcat(r,t4);
 
       char* reply5 = ",\n\"celsius\":";

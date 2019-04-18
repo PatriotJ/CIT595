@@ -25,5 +25,5 @@ void configure(int fd);
 int temprature_change(char* s);
 void* read_from_arduino(void* arg);
 void* print_tempareture(void* arg);
-
+int is_c;
 #endif
