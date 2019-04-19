@@ -2,20 +2,28 @@ function getTemperature() {
     // console.log("in get temperature");
     $.getJSON("http://localhost:1306/?temperature?1",
     (data, status) => {
-        // console.log(data);
-        $("#temperature").html(data.temperature + offset);
-        $("#max").html(data.max_temp+ offset);
-        $("#min").html(data.min_temp+ offset);
-        $("#avg").html(data.avg_temp+ offset);
-        if(data.celsius == 0) {
-            $('.unit').html("F");
+        if(data.connect != 1) {
+            $("#temperature").html("Arduino not connected");
+            $("#max").html("Arduino not connected");
+            $("#min").html("Arduino not connected");
+            $("#avg").html("Arduino not connected");
         }
-        else if(data.celsius == 1) {
-            $('.unit').html("C");
+        else {
+            // console.log(data);
+            $("#temperature").html(data.temperature + offset);
+            $("#max").html(data.max_temp+ offset);
+            $("#min").html(data.min_temp+ offset);
+            $("#avg").html(data.avg_temp+ offset);
+            if(data.celsius == 0) {
+                $('.unit').html("F");
+            }
+            else if(data.celsius == 1) {
+                $('.unit').html("C");
+            }
+            // there should be another tag to show whether sensor is connected or not
+            // there is another tag to indicate C or F
+            // offset++;
         }
-        // there should be another tag to show whether sensor is connected or not
-        // there is another tag to indicate C or F
-        // offset++;
     });
 }
 function changeLightColor() {
