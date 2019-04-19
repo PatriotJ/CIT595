@@ -168,12 +168,12 @@ float current_temp;
 int temp_cur = 0; 
 int temp_size = 0;
 float sum_temp = 0;
-int control = 1;
+int control;
 int arduino;
 // 0 means not disconnected
 // 1 means disconnected
 int connected = 1;
-
+int is_c = 1;
 /*
 This code configures the file descriptor for use as a serial port.
 */
@@ -208,7 +208,11 @@ int temprature_change(char* s){
       char* k = &s[i];
       // float cur_temperature = atof(k);
       current_temp = atof(k);
+      if(is_c == 0){
+        current_temp = (current_temp - 32) * 5 / 9;
+      }
       if(temp_size < 3600){
+        
         temperature[temp_cur] = current_temp;
         sum_temp += current_temp;
         
@@ -258,9 +262,12 @@ void* read_from_arduino(void* arg){
   char arr[100];
   int start = 0;
   int arr_pos = 0;
-  while(control){
+  while(control == 1){
     char buf[1];
     while(connected == 1){
+      if(control == 0){
+        break;
+      }
     int bytes_read = read(arduino,buf,1);
     // printf("%s",buf);
     if(errno == ENXIO || errno == EBADF){
@@ -305,6 +312,7 @@ void* read_from_arduino(void* arg){
 
   
 }
+printf("Stop reading\n");
 }
 
 void* print_tempareture(void* arg){
