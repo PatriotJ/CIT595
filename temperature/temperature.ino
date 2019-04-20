@@ -37,7 +37,7 @@ const byte NumberLookup[16] =   {0x3F,0x06,0x5B,0x4F,0x66,
 int is_f = 0;
 int light_model = 0;
 int light_color = 0;
-int turn_on = 0;
+int turn_on = 1;
 //char buf[100];
 String buf = "";
 /* Function prototypes */
@@ -158,9 +158,9 @@ void loop()
       }
       else if(buf.equals("NORMAL") == 1){
         light_model = 3;
-      }else if(buf.equals("OFF") == 1){
+      }else if(buf.equals("STOP") == 1){
         turn_on = 0;
-      }else if(buf.equals("ON") == 1){
+      }else if(buf.equals("RESUME") == 1){
         turn_on = 1;
       }
 
@@ -178,6 +178,13 @@ void loop()
     
     /* Display temperature on the 7-Segment */
     Dis_7SEG (Decimal, Temperature_H, Temperature_L, IsPositive);
+    }
+    else{
+      UpdateRGB (Temperature_H);
+    Send7SEG (3,0x00);
+    Send7SEG (2,0x00);
+    Send7SEG (1,0x00);
+    Send7SEG (0,0x00);
     }
     delay (1000);        /* Take temperature read every 1 second */
   }
