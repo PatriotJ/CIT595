@@ -74,6 +74,7 @@ void setup()
 void loop() 
 { 
   String msg = "";
+//  int turn_on = 1;
   int Decimal;
   byte Temperature_H, Temperature_L, counter, counter2;
   bool IsPositive;
@@ -133,6 +134,7 @@ void loop()
 //      String buf = "";
       buf = Serial.readString();
       Serial.print(buf);
+      
       bool sss = buf.equals("BLUE");
       Serial.print(sss);
       if(buf.equals("FAH") == 1){
@@ -144,13 +146,16 @@ void loop()
       else if(buf.equals("RED") == 1){
         light_model = 1;
         light_color = 1;
-      }else if(buf.equals("BLUE") == 1 || buf.equals("BLUE\n") == 1){
+      }
+      else if(buf.equals("BLUE") == 1 || buf.equals("BLUE\n") == 1){
         light_model = 1;
         light_color = 0;
-      }else if(buf.equals("GREEN") == 1){
+      }
+      else if(buf.equals("GREEN") == 1){
         light_model = 1;
         light_color = 2;
-      }else if(buf.equals("OFF") == 1){
+      }
+      else if(buf.equals("OFF") == 1){
         light_model = 0;
       }
       else if(buf.equals("RANDOM") == 1){
@@ -158,33 +163,43 @@ void loop()
       }
       else if(buf.equals("NORMAL") == 1){
         light_model = 3;
-      }else if(buf.equals("STOP") == 1){
+      }
+      else if(buf.equals("STOP\n") == 1 || buf.equals("STOP") == 1){
         turn_on = 0;
-      }else if(buf.equals("RESUME") == 1){
+      }
+      else if(buf.equals("RESUME\n") == 1 || buf.equals("RESUME") == 1){
+//        Serial.print(buf.equals("RESUME"));
         turn_on = 1;
       }
 
     }
-    
-    
+    Serial.print(buf);
+    Serial.print(buf.equals("RESUME\n"));
+    Serial.print(turn_on);
     if(is_f == 1){
       Convert(Temperature_H, Decimal);
     }
     
     SerialMonitorPrint (Temperature_H, Decimal, IsPositive);
+//    Serial.print(turn_on);
     if(turn_on == 1){
     /* Update RGB LED.*/
+    Serial.print("a");
     UpdateRGB (Temperature_H);
-    
+    Serial.print(Decimal);
+    Serial.print(Temperature_H);
+    Serial.print(Temperature_L);
+    Serial.print(IsPositive);
     /* Display temperature on the 7-Segment */
     Dis_7SEG (Decimal, Temperature_H, Temperature_L, IsPositive);
     }
     else{
+      Serial.print("b");
       UpdateRGB (Temperature_H);
-    Send7SEG (3,0x00);
-    Send7SEG (2,0x00);
-    Send7SEG (1,0x00);
-    Send7SEG (0,0x00);
+      Send7SEG (4,0x00);
+      Send7SEG (3,0x00);
+      Send7SEG (2,0x00);
+      Send7SEG (1,0x00);
     }
     delay (1000);        /* Take temperature read every 1 second */
   }
