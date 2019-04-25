@@ -2,20 +2,28 @@ function getTemperature() {
     // console.log("in get temperature");
     $.getJSON("http://localhost:1306/?temperature?1",
     (data, status) => {
-        // console.log(data);
-        $("#temperature").html(data.temperature + offset);
-        $("#max").html(data.max_temp+ offset);
-        $("#min").html(data.min_temp+ offset);
-        $("#avg").html(data.avg_temp+ offset);
-        if(data.celsius == 0) {
-            $('.unit').html("F");
+        if(data.connect != 1) {
+            $("#temperature").html("Arduino not connected");
+            $("#max").html("Arduino not connected");
+            $("#min").html("Arduino not connected");
+            $("#avg").html("Arduino not connected");
         }
-        else if(data.celsius == 1) {
-            $('.unit').html("C");
+        else {
+            // console.log(data);
+            $("#temperature").html(data.temperature + offset);
+            $("#max").html(data.max_temp+ offset);
+            $("#min").html(data.min_temp+ offset);
+            $("#avg").html(data.avg_temp+ offset);
+            if(data.celsius == 0) {
+                $('.unit').html("F");
+            }
+            else if(data.celsius == 1) {
+                $('.unit').html("C");
+            }
+            // there should be another tag to show whether sensor is connected or not
+            // there is another tag to indicate C or F
+            // offset++;
         }
-        
-        // there is another tag to indicate C or F
-        // offset++;
     });
 }
 function changeLightColor() {
@@ -28,12 +36,23 @@ function changeLightColor() {
 function arduinoControl() {
     var value = $(this).attr("value");
     // console.log(value);
-    if(value == "stop") stopUpdate();
-    if(value == "open") updateTemperature();
+    if(value == "stop") {
+        stopUpdate();
+        var res = $.get("http://localhost:1306/?reading?stop?");
+    }
+    if(value == "open") {
+        updateTemperature();
+        var res = $.get("http://localhost:1306/?reading?resume?");
+    }
     
 }
 function stopUpdate() {
     clearInterval(timer);
+    $("#temperature").html("Arduino not connected");
+    $("#max").html("Arduino not connected");
+    $("#min").html("Arduino not connected");
+    $("#avg").html("Arduino not connected");
+    $('.unit').html("");
 }
 function updateTemperature() {
     timer = setInterval(getTemperature,1000);
@@ -41,9 +60,14 @@ function updateTemperature() {
 
 function switchingUnit() {
     var unit = $(this).attr('value');
-    var res = $.get("http://localhost:1306/?unit?" + unit);
+    var res = $.get("http://localhost:1306/?unit?" + unit+"?");
+}
+function terminate() {
+    console.log("in terminate method");
+    var res = $.get("http://localhost:1306/?off?");
 }
 
+//author: cyj
 function getWindChillTemperature() {
     $.getJSON("http://localhost:1306/?temperature?1",
     (data, status) => {
@@ -54,10 +78,11 @@ function getWindChillTemperature() {
         }
         var wct = 35.74 + 0.6215*temperature - 35.75*Math.pow(windSpeed, 0.16) + 0.4275*temperature*Math.pow(windSpeed, 0.16);
         wct+=" F";
-        $('showWindChillTemperature').html(wct);
+        $('#showWindChillTemperature').html(wct);
     });
 }
 
+//cyj
 function recordTenTemperatures() {
     //get the current temperature and its unit
     var temp = $("#temperature").text();
@@ -67,15 +92,16 @@ function recordTenTemperatures() {
     while(TenTemperatures.length>=10) TenTemperatures.pop();
     TenTemperatures.splice(0,0,currentTemperature);
     //show the array on the web page
-    for (var i = 0; i < currentTemperature.length; i++) {
-        $("#.i"+i).html(currentTemperature[i]);
+    for (var i = 0; i < TenTemperatures.length; i++) {
+        $("#i"+i).html(TenTemperatures[i]);
     }
 }
+
 // $("#clickMe").click(getTemperature);
 var stop = false;
 var timer = setInterval(getTemperature, 1000);
 var offset = 0;
-var timer = setInterval(recordTenTemperatures, 10000);
+var timer2 = setInterval(recordTenTemperatures, 5000);
 var TenTemperatures = [];
 
 // color control
@@ -88,5 +114,6 @@ $("#normal").click(changeLightColor);
 // temperature update control
 $(".arduinoControl").click(arduinoControl);
 $(".unitsControl").click(switchingUnit);
+$(".terminate").click(terminate);
 //get wind chill temperature
 $("#getWindChillTemperatureButton").click(getWindChillTemperature);

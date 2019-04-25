@@ -202,12 +202,18 @@ void configure(int fd) {
 }
 
 int temprature_change(char* s){
+  printf("%s\n",s);
   int i = 0;
   while(s[i]){
     if(isdigit(s[i])){
       char* k = &s[i];
       // float cur_temperature = atof(k);
       current_temp = atof(k);
+      printf("%f\n",current_temp);
+      // if(current_temp < 5){
+      //   printf("%d\n",current_temp);
+      //   continue;
+      // }
       if(is_c == 0){
         current_temp = (current_temp - 32) * 5 / 9;
       }
