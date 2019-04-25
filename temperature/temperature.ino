@@ -274,7 +274,12 @@ void Dis_7SEG (int Decimal, byte High, byte Low, bool sign)
 
   if (Digit > 0)                 /* Display "c" if there is more space on 7-SEG */
   {
+    if(is_f == 0){
     Send7SEG (Digit,0x58);
+    }
+    else if(is_f == 1){
+      Send7SEG(Digit,0x71);
+    }
     Digit--;
   }
   

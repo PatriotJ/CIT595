@@ -373,61 +373,9 @@ int parse(char *request){
       return 0;
 }
 
-
-
-void* start_server(void* arg)
-{ 
-int PORT_NUMBER = *(int*)arg;
-      // structs to represent the server and client
-      struct sockaddr_in server_addr,client_addr;    
+void *process(void* args){
+      int fd = *(int*)args;
       
-      int sock; // socket descriptor
-
-      // 1. socket: creates a socket descriptor that you later use to make other system calls
-      if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-	perror("Socket");
-	exit(1);
-      }
-      int temp;
-      if (setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&temp,sizeof(int)) == -1) {
-	perror("Setsockopt");
-	exit(1);
-      }
-
-      // configure the server
-      server_addr.sin_port = htons(PORT_NUMBER); // specify port number
-      server_addr.sin_family = AF_INET;         
-      server_addr.sin_addr.s_addr = INADDR_ANY; 
-      bzero(&(server_addr.sin_zero),8); 
-      
-      // 2. bind: use the socket and associate it with the port number
-      if (bind(sock, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) == -1) {
-	perror("Unable to bind");
-	exit(1);
-      }
-
-      // 3. listen: indicates that we want to listen to the port to which we bound; second arg is number of allowed connections
-      if (listen(sock, 1) == -1) {
-	perror("Listen");
-	exit(1);
-      }
-          
-      // once you get here, the server is set up and about to start listening
-      printf("\nServer configured to listen on port %d\n", PORT_NUMBER);
-      fflush(stdout);
-     while(control){
-      //      i++;
-      //      printf("%d\n",i);
-      // 4. accept: wait here until we get a connection on that port
-      int sin_size = sizeof(struct sockaddr_in);
-      int fd = accept(sock, (struct sockaddr *)&client_addr,(socklen_t *)&sin_size);
-      if (fd != -1) {
-	printf("Server got a connection from (%s, %d)\n", inet_ntoa(client_addr.sin_addr),ntohs(client_addr.sin_port));
-      
-	// buffer to read data into
-	// char request[1024];
-	
-	// 5. recv: read incoming message (request) into buffer
       pthread_mutex_lock(&request_lock);
 	int bytes_received = recv(fd,request,1024,0);
 	// null-terminate the string
@@ -439,7 +387,7 @@ int PORT_NUMBER = *(int*)arg;
 
       if(control == 0){
             control = 0;
-            break;
+            return NULL;
       }
 
 
@@ -498,20 +446,158 @@ int PORT_NUMBER = *(int*)arg;
       strcat(r,t6);
 
       strcat(r,"\n}");
+	// 6. send: send the outgoing message (response) over the socket
+	// note that the second argument is a char*, and the third is the number of chars	
+
+	send(fd, r, strlen(r), 0);
+      memset(r,0,1000);
+      close(fd);
+      return NULL;
+}
+
+void* start_server(void* arg)
+{ 
+int PORT_NUMBER = *(int*)arg;
+      // structs to represent the server and client
+      struct sockaddr_in server_addr,client_addr;    
+      
+      int sock; // socket descriptor
+
+      // 1. socket: creates a socket descriptor that you later use to make other system calls
+      if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+	perror("Socket");
+	exit(1);
+      }
+      int temp;
+      if (setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&temp,sizeof(int)) == -1) {
+	perror("Setsockopt");
+	exit(1);
+      }
+
+      // configure the server
+      server_addr.sin_port = htons(PORT_NUMBER); // specify port number
+      server_addr.sin_family = AF_INET;         
+      server_addr.sin_addr.s_addr = INADDR_ANY; 
+      bzero(&(server_addr.sin_zero),8); 
+      
+      // 2. bind: use the socket and associate it with the port number
+      if (bind(sock, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) == -1) {
+	perror("Unable to bind");
+	exit(1);
+      }
+
+      // 3. listen: indicates that we want to listen to the port to which we bound; second arg is number of allowed connections
+      if (listen(sock, 1) == -1) {
+	perror("Listen");
+	exit(1);
+      }
+          
+      // once you get here, the server is set up and about to start listening
+      printf("\nServer configured to listen on port %d\n", PORT_NUMBER);
+      fflush(stdout);
+     while(control){
+      //      i++;
+      //      printf("%d\n",i);
+      // 4. accept: wait here until we get a connection on that port
+      int sin_size = sizeof(struct sockaddr_in);
+      int* fd = malloc(sizeof(int));
+      *fd = accept(sock, (struct sockaddr *)&client_addr,(socklen_t *)&sin_size);
+      // int fd = &t;
+      // pthread_create(&threads[1], NULL, (void *)&start_server, (void*) &port_number);
+      if (*fd != -1) {
+	printf("Server got a connection from (%s, %d)\n", inet_ntoa(client_addr.sin_addr),ntohs(client_addr.sin_port));
+      
+	// buffer to read data into
+	// char request[1024];
+	pthread_t thread;
+      pthread_create(&thread,NULL,&process,(void*)fd);
+      pthread_detach(thread);
+	// 5. recv: read incoming message (request) into buffer
+      // pthread_mutex_lock(&request_lock);
+	// int bytes_received = recv(fd,request,1024,0);
+	// // null-terminate the string
+	// request[bytes_received] = '\0';
+	// // print it to standard out
+	// // printf("This is the incoming request:\n%s\n", request);
+      // int xxx = parse(request);
+      // pthread_mutex_unlock(&request_lock);
+
+      // if(control == 0){
+      //       control = 0;
+      //       break;
+      // }
+
+
+	// // this is the message that we'll send back
+      // char r[1000];
+      // char t1[20];
+      // float current,max,min,avg;
+      // if(is_c == 0){
+      //       current = current_temp * 1.8 +32;
+      //       max = max_temp * 1.8 + 32;
+      //       min = min_temp*1.8 + 32;
+      //       avg = avg_temp * 1.8 + 32;
+      // }
+      // else{
+      //       current = current_temp;
+      //       max = max_temp;
+      //       min = min_temp;
+      //       avg = avg_temp;
+      // }
+
+      // char *reply = "HTTP/1.1 200 OK\nAccess-Control-Allow-Origin: * \nContent-Type: application/json\n\n{\n\"temperature\":";
+      // strcat(r,reply);
+      
+      // sprintf(t1,"%f",current);
+      // strcat(r,t1);
+
+      // char *reply2 = ",\n\"max_temp\":";
+      // strcat(r,reply2);
+      // char t2[20];
+      // sprintf(t2,"%f",max);
+      // strcat(r,t2);
+
+      // char *reply3 = ",\n\"min_temp\":";
+      // strcat(r,reply3);
+      // char t3[20];
+      // sprintf(t3,"%f",min);
+      // strcat(r,t3);
+
+      // char* reply4 = ",\n\"avg_temp\":";
+      // strcat(r,reply4);
+      // char t4[20];
+      // sprintf(t4,"%f",avg);
+      // strcat(r,t4);
+
+      // char* reply5 = ",\n\"celsius\":";
+      // strcat(r,reply5);
+      // char t5[10];
+      // // int is_c = 1;
+      // sprintf(t5,"%d",is_c);
+      // strcat(r,t5);
+
+      // char* reply6 = ",\n\"connect\":";
+      // strcat(r,reply6);
+      // char t6[10];
+      // sprintf(t6,"%d",connected);
+      // strcat(r,t6);
+
+      // strcat(r,"\n}");
 
       
 
 
 
 
-	// 6. send: send the outgoing message (response) over the socket
-	// note that the second argument is a char*, and the third is the number of chars	
+	// // 6. send: send the outgoing message (response) over the socket
+	// // note that the second argument is a char*, and the third is the number of chars	
 
-	send(fd, r, strlen(r), 0);
-      memset(r,0,1000);
+	// send(fd, r, strlen(r), 0);
+      // memset(r,0,1000);
       }
 	// 7. close: close the connection
-	close(fd);
+	// close(*fd);
+      free(fd);
 	printf("Server closed connection\n");
       }
 
@@ -521,6 +607,7 @@ int PORT_NUMBER = *(int*)arg;
   
       return 0;
 } 
+
 
 
 
@@ -549,10 +636,15 @@ control = 1;
 printf("%d\n",control);
     pthread_t threads[3];
     pthread_create(&threads[0], NULL, read_from_arduino, (void *)filename);
-    pthread_create(&threads[1], NULL, (void *)&start_server, (void*) &port_number);
+//     for(int i  = 1; i < 10 ;i ++ ){
+          pthread_create(&threads[1], NULL, (void *)&start_server, (void*) &port_number);
+//     }
+    
 //     pthread_create(&threads[2], NULL, (void *)&start_server, (void*) &port_number);
     pthread_join(threads[0],NULL);
+      // for(int i  = 1; i < 10 ;i ++ ){
     pthread_join(threads[1],NULL);
+//     }
 //     pthread_join(threads[2],NULL);
     // start_server(port_number);
     }

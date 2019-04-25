@@ -174,6 +174,7 @@ int arduino;
 // 1 means disconnected
 int connected = 1;
 int is_c = 1;
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 /*
 This code configures the file descriptor for use as a serial port.
 */
@@ -297,7 +298,9 @@ void* read_from_arduino(void* arg){
             arr_pos ++;
             if(buf[0] == '\n'){
                 if(arr_pos >= 34){
+                  pthread_mutex_lock(&lock);
                     temprature_change(arr);
+                    pthread_mutex_unlock(&lock);
                     arr_pos = 0;
                     start = 0;
                 }
@@ -307,6 +310,7 @@ void* read_from_arduino(void* arg){
         }
     }
   }
+  is_c = 1;
   arduino = open(filename, O_RDWR | O_NOCTTY | O_NDELAY);
   if(arduino < 0){
     sleep(1);
