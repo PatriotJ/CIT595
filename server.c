@@ -450,7 +450,7 @@ int PORT_NUMBER = *(int*)arg;
       if(is_c == 0){
             current = current_temp * 1.8 +32;
             max = max_temp * 1.8 + 32;
-            min = min*1.8 + 32;
+            min = min_temp*1.8 + 32;
             avg = avg_temp * 1.8 + 32;
       }
       else{
