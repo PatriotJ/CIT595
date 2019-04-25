@@ -87,13 +87,13 @@ function recordTenTemperatures() {
     //get the current temperature and its unit
     var temp = $("#temperature").text();
     var unit = $(".unit").text();
-    var currentTemperature = temp + " " + unit;
+    var currentTemperature = temp + " " + unit[0];
     //insert it into the TenTemperatures arrays
     while(TenTemperatures.length>=10) TenTemperatures.pop();
     TenTemperatures.splice(0,0,currentTemperature);
     //show the array on the web page
     for (var i = 0; i < TenTemperatures.length; i++) {
-        $("#i"+i).html(TenTemperatures[i]);
+        $("#t"+i).html(TenTemperatures[i]);
     }
 }
 
@@ -101,7 +101,7 @@ function recordTenTemperatures() {
 var stop = false;
 var timer = setInterval(getTemperature, 1000);
 var offset = 0;
-var timer2 = setInterval(recordTenTemperatures, 5000);
+var timer2 = setInterval(recordTenTemperatures, 2333);
 var TenTemperatures = [];
 
 // color control
